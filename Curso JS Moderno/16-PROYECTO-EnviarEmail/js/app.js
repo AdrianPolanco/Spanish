@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     //Seleccionar los elementos de la interfaz
     const inputEmail = document.querySelector("#email");
-    const inputCc = document.querySelector("#Cc");
+    const inputCc = document.querySelector("#cc");
     const inputAsunto = document.querySelector("#asunto");
     const inputMensaje = document.querySelector("#mensaje");
     const formulario = document.querySelector("#formulario");
@@ -33,9 +33,11 @@ document.addEventListener("DOMContentLoaded", () => {
         resetFormulario();
     });
 
+    console.log(verificar);
+
     function validar(e) {
         //Se recomienda usar .trim() en las validaciones de e.target.value.trim()
-        if (e.target.value.trim() === "") {
+        if (e.target.value.trim() === "" && e.target.id !== "cc") {
             mostrarAlerta(
                 `El campo ${e.target.id} es obligatario`,
                 e.target.parentElement
@@ -47,11 +49,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (
             (!validarEmail(e.target.value) && e.target.id === "email") ||
-            (!validarEmail(e.target.value) && e.target.id === "Cc")
+            (!validarEmail(e.target.value) && e.target.id === "cc")
         ) {
             mostrarAlerta("El email NO es válido", e.target.parentElement);
             verificar[e.target.name] = "";
             comprobarEmail();
+            if (e.target.name === "cc" && e.target.value === "") {
+                limpiarAlerta(e.target.parentElement);
+            }
             return;
         }
 
@@ -72,6 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function limpiarAlerta(referencia) {
         const alerta = referencia.querySelector(".bg-red-600");
+
         if (alerta) {
             alerta.remove();
         }
@@ -85,7 +91,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function comprobarEmail() {
-        if (Object.values(verificar).includes("")) {
+        const objeto = Object.keys(verificar);
+        const filtrar = objeto.filter((llave) => !llave.includes("cc"));
+        const nuevoObjeto = {};
+
+        for (let item of filtrar) {
+            nuevoObjeto[item] = verificar[item];
+        }
+
+        if (Object.values(nuevoObjeto).includes("")) {
             btnSubmit.classList.add("opacity-50");
             btnSubmit.disabled = true;
             return;
