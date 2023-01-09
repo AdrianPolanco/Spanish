@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
         asunto: "",
         mensaje: "",
     };
+    const nuevoObjeto = {};
+    const objetoCc = {};
 
     //Seleccionar los elementos de la interfaz
     const inputEmail = document.querySelector("#email");
@@ -33,8 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
         resetFormulario();
     });
 
-    console.log(verificar);
-
     function validar(e) {
         //Se recomienda usar .trim() en las validaciones de e.target.value.trim()
         if (e.target.value.trim() === "" && e.target.id !== "cc") {
@@ -59,6 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             return;
         }
+        console.log(verificar);
 
         limpiarAlerta(e.target.parentElement);
         verificar[e.target.name] = e.target.value.trim().toLowerCase();
@@ -93,20 +94,29 @@ document.addEventListener("DOMContentLoaded", () => {
     function comprobarEmail() {
         const objeto = Object.keys(verificar);
         const filtrar = objeto.filter((llave) => !llave.includes("cc"));
-        const nuevoObjeto = {};
+        const checkCc = objeto.filter((cc) => cc.includes("cc"));
+
+        for (let item of checkCc) {
+            objetoCc[item] = verificar[item];
+        }
 
         for (let item of filtrar) {
             nuevoObjeto[item] = verificar[item];
         }
 
-        if (Object.values(nuevoObjeto).includes("")) {
+        if (
+            Object.values(nuevoObjeto).includes("") ||
+            Object.values(objetoCc).includes("") & (inputCc.value !== "")
+        ) {
             btnSubmit.classList.add("opacity-50");
             btnSubmit.disabled = true;
             return;
         }
 
-        btnSubmit.classList.remove("opacity-50");
-        btnSubmit.disabled = false;
+        if (!Object.values(objetoCc).includes("") || inputCc.value === "") {
+            btnSubmit.classList.remove("opacity-50");
+            btnSubmit.disabled = false;
+        }
     }
 
     function enviarEmail(e) {
